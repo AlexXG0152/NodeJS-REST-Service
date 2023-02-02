@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -17,22 +19,22 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('/')
-  getAllUsers() {
+  async getAllUsers() {
     return this.userService.getUsers();
   }
 
   @Get(':id')
-  getOneUser(@Param('id') id: string) {
+  async getOneUser(@Param('id') id: string) {
     return this.userService.getUser(id);
   }
 
   @Post()
-  createOneUser(@Body() user: CreateUserDto) {
+  async createOneUser(@Body() user: CreateUserDto) {
     return this.userService.createUser(user);
   }
 
   @Put(':id')
-  updateOneUser(
+  async updateOneUser(
     @Param('id') id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
@@ -40,7 +42,8 @@ export class UserController {
   }
 
   @Delete(':id')
-  deleteOneUser(@Param('id') id: string) {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteOneUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);
   }
 }
