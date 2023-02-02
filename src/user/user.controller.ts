@@ -36,9 +36,9 @@ export class UserController {
   @Put(':id')
   async updateOneUser(
     @Param('id') id: string,
-    @Body() updatePasswordDto: UpdatePasswordDto,
+    @Body() data: UpdatePasswordDto,
   ) {
-    return this.userService.updateUser(id, updatePasswordDto);
+    return this.userService.updateUser(id, data);
   }
 
   @Delete(':id')
