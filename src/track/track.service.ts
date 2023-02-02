@@ -5,19 +5,18 @@ import { validate as uuidValidate } from 'uuid';
 import { ITrack } from './track.interface';
 import { TrackDto } from './dto/track.dto';
 
+const tracks: ITrack[] = [];
 @Injectable({})
 export class TrackService {
-  private tracks: ITrack[] = [];
-
   async getTracks() {
-    return this.tracks;
+    return tracks;
   }
 
   async getTrack(id: string) {
     await this.checkUUID(id);
 
     try {
-      await this.cheskIsTrackExists(id);
+      return await this.cheskIsTrackExists(id);
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -31,7 +30,7 @@ export class TrackService {
         updatedAt: Date.now(),
       };
 
-      this.tracks.push({ ...track, ...dbServiceInfo });
+      tracks.push({ ...track, ...dbServiceInfo });
 
       return { ...track, ...dbServiceInfo };
     } catch (error) {}
@@ -42,36 +41,48 @@ export class TrackService {
 
     await this.cheskIsTrackExists(id);
 
-    for (const track in this.tracks) {
-      if (Object.prototype.hasOwnProperty.call(this.tracks, track)) {
-        if (this.tracks[track].id === id) {
-          //   if (this.tracks[track].password === data.newPassword) {
-          //     throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
-          //   }
-          this.tracks[track].name = data.name;
-          this.tracks[track].artistId = data.artistId;
-          this.tracks[track].albumId = data.albumId;
-          this.tracks[track].duration = data.duration;
-          this.tracks[track].version += 1;
-          this.tracks[track].updatedAt = Date.now();
+    for (const track in tracks) {
+      if (Object.prototype.hasOwnProperty.call(tracks, track)) {
+        if (tracks[track].id === id) {
+          tracks[track].name = data.name;
+          tracks[track].artistId = data.artistId;
+          tracks[track].albumId = data.albumId;
+          tracks[track].duration = data.duration;
+          tracks[track].version += 1;
+          tracks[track].updatedAt = Date.now();
 
-          //   const { password, ...rest } = this.tracks[user];
-          return this.tracks[track];
+          return tracks[track];
         }
       }
     }
   }
 
+  async updateManyTracksAfterArtistDelete(id: string) {
+    console.log(id);
+    console.log(tracks);
+
+    for (const track in tracks) {
+      if (Object.prototype.hasOwnProperty.call(tracks, track)) {
+        if (tracks[track].artistId === id) {
+          tracks[track].artistId = null;
+          tracks[track].version += 1;
+          tracks[track].updatedAt = Date.now();
+        }
+      }
+    }
+    console.log(tracks);
+  }
+
   async deleteTrack(id: string) {
     await this.checkUUID(id);
 
-    const trackIndex = this.tracks.findIndex((track) => track.id === id);
+    const trackIndex = tracks.findIndex((track) => track.id === id);
     if (trackIndex === -1) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
     if (trackIndex > -1) {
-      this.tracks.splice(trackIndex, 1);
+      tracks.splice(trackIndex, 1);
     }
     return 'HttpStatus.NO_CONTENT';
   }
@@ -83,7 +94,7 @@ export class TrackService {
   }
 
   async cheskIsTrackExists(id: string) {
-    const track = this.tracks.find((track) => track.id === id);
+    const track = tracks.find((track) => track.id === id);
     if (!track) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
