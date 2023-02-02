@@ -6,21 +6,21 @@ import { ArtistDto } from './dto/artist.dto';
 import { TrackService } from '../track/track.service';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
 
+const artists: IArtist[] = [];
+
 @Injectable()
 export class ArtistService {
   constructor(private trackService: TrackService) {}
 
-  private artists: IArtist[] = [];
-
   async getArtists() {
-    return this.artists;
+    return artists;
   }
 
   async getArtist(id: string) {
     await checkUUID(id);
 
     try {
-      return await cheskIsExists(id, this.artists);
+      return await cheskIsExists(id, artists);
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -34,7 +34,7 @@ export class ArtistService {
         updatedAt: Date.now(),
       };
 
-      this.artists.push({ ...artist, ...dbServiceInfo });
+      artists.push({ ...artist, ...dbServiceInfo });
 
       return { ...artist, ...dbServiceInfo };
     } catch (error) {}
@@ -43,15 +43,15 @@ export class ArtistService {
   async updateArtist(id: string, data: ArtistDto) {
     await checkUUID(id);
 
-    await cheskIsExists(id, this.artists);
+    await cheskIsExists(id, artists);
 
-    for (const artist in this.artists) {
-      if (Object.prototype.hasOwnProperty.call(this.artists, artist)) {
-        if (this.artists[artist].id === id) {
-          this.artists[artist].name = data.name;
-          this.artists[artist].grammy = data.grammy;
+    for (const artist in artists) {
+      if (Object.prototype.hasOwnProperty.call(artists, artist)) {
+        if (artists[artist].id === id) {
+          artists[artist].name = data.name;
+          artists[artist].grammy = data.grammy;
 
-          return this.artists[artist];
+          return artists[artist];
         }
       }
     }
@@ -61,13 +61,13 @@ export class ArtistService {
     await checkUUID(id);
     await this.trackService.updateManyTracksAfterDelete(id, 'artist');
 
-    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
+    const artistIndex = artists.findIndex((artist) => artist.id === id);
     if (artistIndex === -1) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
     if (artistIndex > -1) {
-      this.artists.splice(artistIndex, 1);
+      artists.splice(artistIndex, 1);
     }
 
     return 'HttpStatus.NO_CONTENT';

@@ -7,5 +7,6 @@ import { TrackService } from 'src/track/track.service';
   controllers: [ArtistController],
   providers: [ArtistService, TrackService],
   imports: [TrackService],
+  exports: [ArtistService],
 })
 export class ArtistModule {}

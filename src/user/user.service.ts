@@ -1,25 +1,24 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { validate as uuidValidate } from 'uuid';
 
 import { IUser } from './user.interface';
 import { UpdatePasswordDto } from './dto/updateUser.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
 
+const users: IUser[] = [];
+
 @Injectable({})
 export class UserService {
-  private users: IUser[] = [];
-
   async getUsers() {
-    return this.users;
+    return users;
   }
 
   async getUser(id: string) {
     await checkUUID(id);
 
     try {
-      return await cheskIsExists(id, this.users);
+      return await cheskIsExists(id, users);
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -34,7 +33,7 @@ export class UserService {
         updatedAt: Date.now(),
       };
 
-      this.users.push({ ...user, ...dbServiceInfo });
+      users.push({ ...user, ...dbServiceInfo });
 
       delete user.password;
       return { ...user, ...dbServiceInfo };
@@ -44,18 +43,18 @@ export class UserService {
   async updateUser(id: string, data: UpdatePasswordDto) {
     await checkUUID(id);
 
-    await cheskIsExists(id, this.users);
+    await cheskIsExists(id, users);
 
-    for (const user in this.users) {
-      if (Object.prototype.hasOwnProperty.call(this.users, user)) {
-        if (this.users[user].id === id) {
-          if (this.users[user].password === data.newPassword) {
+    for (const user in users) {
+      if (Object.prototype.hasOwnProperty.call(users, user)) {
+        if (users[user].id === id) {
+          if (users[user].password === data.newPassword) {
             throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
           }
-          this.users[user].version += 1;
-          this.users[user].password = data.newPassword;
-          this.users[user].updatedAt = Date.now();
-          const { password, ...rest } = this.users[user];
+          users[user].version += 1;
+          users[user].password = data.newPassword;
+          users[user].updatedAt = Date.now();
+          const { password, ...rest } = users[user];
           return rest;
         }
       }
@@ -65,13 +64,13 @@ export class UserService {
   async deleteUser(id: string) {
     await checkUUID(id);
 
-    const userIndex = this.users.findIndex((user) => user.id === id);
+    const userIndex = users.findIndex((user) => user.id === id);
     if (userIndex === -1) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
 
     if (userIndex > -1) {
-      this.users.splice(userIndex, 1);
+      users.splice(userIndex, 1);
     }
     return HttpStatus.CREATED;
   }

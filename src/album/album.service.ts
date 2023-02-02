@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { validate as uuidValidate } from 'uuid';
 
 import { AlbumDto } from './dto/album.dto';
 import { IAlbum } from './album.interface';

@@ -1,4 +1,3 @@
-import { Optional } from '@nestjs/common';
 import { IsNotEmpty, IsString, Min, MinLength } from 'class-validator';
 
 export interface IAlbumDto {

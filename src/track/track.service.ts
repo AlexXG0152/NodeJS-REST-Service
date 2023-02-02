@@ -1,12 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { validate as uuidValidate } from 'uuid';
 
 import { ITrack } from './track.interface';
 import { TrackDto } from './dto/track.dto';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
 
 export const tracks: ITrack[] = [];
+
 @Injectable({})
 export class TrackService {
   async getTracks() {
