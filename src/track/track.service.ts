@@ -4,8 +4,9 @@ import { validate as uuidValidate } from 'uuid';
 
 import { ITrack } from './track.interface';
 import { TrackDto } from './dto/track.dto';
+import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
 
-const tracks: ITrack[] = [];
+export const tracks: ITrack[] = [];
 @Injectable({})
 export class TrackService {
   async getTracks() {
@@ -13,10 +14,10 @@ export class TrackService {
   }
 
   async getTrack(id: string) {
-    await this.checkUUID(id);
+    await checkUUID(id);
 
     try {
-      return await this.cheskIsTrackExists(id);
+      return await cheskIsExists(id, tracks);
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -37,9 +38,9 @@ export class TrackService {
   }
 
   async updateTrack(id: string, data: TrackDto) {
-    await this.checkUUID(id);
+    await checkUUID(id);
 
-    await this.cheskIsTrackExists(id);
+    await cheskIsExists(id, tracks);
 
     for (const track in tracks) {
       if (Object.prototype.hasOwnProperty.call(tracks, track)) {
@@ -57,24 +58,26 @@ export class TrackService {
     }
   }
 
-  async updateManyTracksAfterArtistDelete(id: string) {
-    console.log(id);
-    console.log(tracks);
-
-    for (const track in tracks) {
-      if (Object.prototype.hasOwnProperty.call(tracks, track)) {
-        if (tracks[track].artistId === id) {
-          tracks[track].artistId = null;
-          tracks[track].version += 1;
-          tracks[track].updatedAt = Date.now();
+  async updateManyTracksAfterDelete(id: string, type: string) {
+    for (const element in tracks) {
+      if (Object.prototype.hasOwnProperty.call(tracks, element)) {
+        if (type === 'artist') {
+          if (tracks[element].artistId === id) {
+            tracks[element].artistId = null;
+          }
+        } else if (type === 'album') {
+          if (tracks[element].albumId === id) {
+            tracks[element].albumId = null;
+          }
         }
+        tracks[element].version += 1;
+        tracks[element].updatedAt = Date.now();
       }
     }
-    console.log(tracks);
   }
 
   async deleteTrack(id: string) {
-    await this.checkUUID(id);
+    await checkUUID(id);
 
     const trackIndex = tracks.findIndex((track) => track.id === id);
     if (trackIndex === -1) {
@@ -85,19 +88,5 @@ export class TrackService {
       tracks.splice(trackIndex, 1);
     }
     return 'HttpStatus.NO_CONTENT';
-  }
-
-  async checkUUID(id: string) {
-    if (!uuidValidate(id)) {
-      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async cheskIsTrackExists(id: string) {
-    const track = tracks.find((track) => track.id === id);
-    if (!track) {
-      throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
-    return track;
   }
 }

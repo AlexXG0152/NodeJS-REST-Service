@@ -5,6 +5,7 @@ import { validate as uuidValidate } from 'uuid';
 import { IUser } from './user.interface';
 import { UpdatePasswordDto } from './dto/updateUser.dto';
 import { CreateUserDto } from './dto/createUser.dto';
+import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
 
 @Injectable({})
 export class UserService {
@@ -15,10 +16,10 @@ export class UserService {
   }
 
   async getUser(id: string) {
-    await this.checkUUID(id);
+    await checkUUID(id);
 
     try {
-      await this.cheskIsUserExists(id);
+      return await cheskIsExists(id, this.users);
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -41,9 +42,9 @@ export class UserService {
   }
 
   async updateUser(id: string, data: UpdatePasswordDto) {
-    await this.checkUUID(id);
+    await checkUUID(id);
 
-    await this.cheskIsUserExists(id);
+    await cheskIsExists(id, this.users);
 
     for (const user in this.users) {
       if (Object.prototype.hasOwnProperty.call(this.users, user)) {
@@ -62,7 +63,7 @@ export class UserService {
   }
 
   async deleteUser(id: string) {
-    await this.checkUUID(id);
+    await checkUUID(id);
 
     const userIndex = this.users.findIndex((user) => user.id === id);
     if (userIndex === -1) {
@@ -73,19 +74,5 @@ export class UserService {
       this.users.splice(userIndex, 1);
     }
     return HttpStatus.CREATED;
-  }
-
-  async checkUUID(id: string) {
-    if (!uuidValidate(id)) {
-      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async cheskIsUserExists(id: string) {
-    const user = this.users.find((user) => user.id === id);
-    if (!user) {
-      throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
-    return user;
   }
 }

@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { validate as uuidValidate } from 'uuid';
 
 import { IArtist } from './artist.interface';
 import { ArtistDto } from './dto/artist.dto';
 import { TrackService } from '../track/track.service';
+import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
 
 @Injectable()
 export class ArtistService {
@@ -17,10 +17,10 @@ export class ArtistService {
   }
 
   async getArtist(id: string) {
-    await this.checkUUID(id);
+    await checkUUID(id);
 
     try {
-      return await this.cheskIsArtistExists(id);
+      return await cheskIsExists(id, this.artists);
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -41,9 +41,9 @@ export class ArtistService {
   }
 
   async updateArtist(id: string, data: ArtistDto) {
-    await this.checkUUID(id);
+    await checkUUID(id);
 
-    await this.cheskIsArtistExists(id);
+    await cheskIsExists(id, this.artists);
 
     for (const artist in this.artists) {
       if (Object.prototype.hasOwnProperty.call(this.artists, artist)) {
@@ -58,8 +58,8 @@ export class ArtistService {
   }
 
   async deleteArtist(id: string) {
-    await this.checkUUID(id);
-    await this.trackService.updateManyTracksAfterArtistDelete(id);
+    await checkUUID(id);
+    await this.trackService.updateManyTracksAfterDelete(id, 'artist');
 
     const artistIndex = this.artists.findIndex((artist) => artist.id === id);
     if (artistIndex === -1) {
@@ -70,21 +70,6 @@ export class ArtistService {
       this.artists.splice(artistIndex, 1);
     }
 
-
     return 'HttpStatus.NO_CONTENT';
-  }
-
-  async checkUUID(id: string) {
-    if (!uuidValidate(id)) {
-      throw new HttpException('BAD_REQUEST', HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async cheskIsArtistExists(id: string) {
-    const artist = this.artists.find((one) => one.id === id);
-    if (!artist) {
-      throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
-    return artist;
   }
 }
