@@ -6,7 +6,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 
-import { IFavoritesRepsonse } from './favorites.interface';
+import { IFavoritesRepsonse, sectionType } from './favorites.interface';
 import { checkUUID } from 'src/helpers/checkers';
 import { AlbumService } from 'src/album/album.service';
 import { ArtistService } from 'src/artist/artist.service';
@@ -29,15 +29,10 @@ export class FavoritesService {
     private trackService: TrackService,
   ) {}
   async getAllFavorites(): Promise<IFavoritesRepsonse> {
-    // const data = {
-    //   artists: await this.artistService.getArtists(),
-    //   albums: await this.albumService.getAlbums(),
-    //   tracks: await this.trackService.getTracks(),
-    // };
     return favorites;
   }
 
-  async addToFavorites(id: string, section: string) {
+  async addToFavorites(id: string, section: sectionType) {
     await checkUUID(id);
     switch (section) {
       case 'artists': {
@@ -80,11 +75,12 @@ export class FavoritesService {
         }
       }
       default:
-        return;
+        const unknownSection: never = section;
+        throw new Error(`Unknown section ${unknownSection}`);
     }
   }
 
-  async deleteFromFavorites(id: string, section: string) {
+  async deleteFromFavorites(id: string, section: sectionType) {
     await checkUUID(id);
     switch (section) {
       case 'artists':
@@ -97,7 +93,8 @@ export class FavoritesService {
         await this.remove(id, 'tracks');
         break;
       default:
-        return;
+        const unknownSection: never = section;
+        throw new Error(`Unknown section ${unknownSection}`);
     }
   }
 

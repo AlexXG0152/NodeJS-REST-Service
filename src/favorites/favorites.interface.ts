@@ -16,3 +16,5 @@ export interface IFavoritesRepsonse {
   albums: IAlbum[];
   tracks: ITrack[];
 }
+
+export type sectionType = 'artists' | 'albums' | 'tracks';
