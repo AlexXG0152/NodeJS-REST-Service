@@ -21,36 +21,36 @@ export class FavoritesController {
   @Post('track/:id')
   @HttpCode(HttpStatus.CREATED)
   async createOneTrackFavorites(@Param('id') id: string) {
-    return this.favoritesService.addToToFavorites(id, 'track');
+    return this.favoritesService.addToFavorites(id, 'tracks');
   }
 
   @Post('album/:id')
   @HttpCode(HttpStatus.CREATED)
   async createOneAlbumFavorites(@Param('id') id: string) {
-    return this.favoritesService.addToToFavorites(id, 'album');
+    return this.favoritesService.addToFavorites(id, 'albums');
   }
 
   @Post('artist/:id')
   @HttpCode(HttpStatus.CREATED)
   async createOneArtistFavorites(@Param('id') id: string) {
-    return this.favoritesService.addToToFavorites(id, 'artist');
+    return this.favoritesService.addToFavorites(id, 'artists');
   }
 
   @Delete('track/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteTrackFavorites(@Param('id') id: string) {
-    return this.favoritesService.deleteFavorites(id, 'track');
+    return this.favoritesService.deleteFromFavorites(id, 'tracks');
   }
 
   @Delete('album/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteOneAlbumFavorites(@Param('id') id: string) {
-    return this.favoritesService.deleteFavorites(id, 'album');
+    return this.favoritesService.deleteFromFavorites(id, 'albums');
   }
 
   @Delete('artist/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteOneArtistFavorites(@Param('id') id: string) {
-    return this.favoritesService.deleteFavorites(id, 'artist');
+    return this.favoritesService.deleteFromFavorites(id, 'artists');
   }
 }

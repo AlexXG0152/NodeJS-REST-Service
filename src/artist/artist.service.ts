@@ -1,16 +1,28 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { IArtist } from './artist.interface';
 import { ArtistDto } from './dto/artist.dto';
 import { TrackService } from '../track/track.service';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 const artists: IArtist[] = [];
 
 @Injectable()
 export class ArtistService {
-  constructor(private trackService: TrackService) {}
+  constructor(
+    @Inject(forwardRef(() => FavoritesService))
+    private favoritesService: FavoritesService,
+    @Inject(forwardRef(() => TrackService))
+    private trackService: TrackService,
+  ) {}
 
   async getArtists() {
     return artists;
@@ -59,7 +71,10 @@ export class ArtistService {
 
   async deleteArtist(id: string) {
     await checkUUID(id);
-    await this.trackService.updateManyTracksAfterDelete(id, 'artist');
+    try {
+      await this.trackService.updateManyTracksAfterDelete(id, 'artist');
+      await this.favoritesService.deleteFromFavorites(id, 'artists');
+    } catch (error) {}
 
     const artistIndex = artists.findIndex((artist) => artist.id === id);
     if (artistIndex === -1) {

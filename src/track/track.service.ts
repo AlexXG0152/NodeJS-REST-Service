@@ -1,14 +1,26 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ITrack } from './track.interface';
 import { TrackDto } from './dto/track.dto';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 export const tracks: ITrack[] = [];
 
 @Injectable({})
 export class TrackService {
+  constructor(
+    @Inject(forwardRef(() => FavoritesService))
+    private favoritesService: FavoritesService,
+  ) {}
+
   async getTracks() {
     return tracks;
   }
@@ -78,6 +90,9 @@ export class TrackService {
 
   async deleteTrack(id: string) {
     await checkUUID(id);
+    try {
+      await this.favoritesService.deleteFromFavorites(id, 'tracks');
+    } catch (error) {}
 
     const trackIndex = tracks.findIndex((track) => track.id === id);
     if (trackIndex === -1) {

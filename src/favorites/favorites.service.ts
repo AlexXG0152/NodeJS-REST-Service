@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 
 import { IFavoritesRepsonse } from './favorites.interface';
 import { checkUUID } from 'src/helpers/checkers';
@@ -6,13 +12,20 @@ import { AlbumService } from 'src/album/album.service';
 import { ArtistService } from 'src/artist/artist.service';
 import { TrackService } from 'src/track/track.service';
 
-const favorites: IFavoritesRepsonse = { artists: [], albums: [], tracks: [] };
+export const favorites: IFavoritesRepsonse = {
+  artists: [],
+  albums: [],
+  tracks: [],
+};
 
-@Injectable()
+@Injectable({})
 export class FavoritesService {
   constructor(
-    private albumService: AlbumService,
+    @Inject(forwardRef(() => ArtistService))
     private artistService: ArtistService,
+    @Inject(forwardRef(() => AlbumService))
+    private albumService: AlbumService,
+    @Inject(forwardRef(() => TrackService))
     private trackService: TrackService,
   ) {}
   async getAllFavorites(): Promise<IFavoritesRepsonse> {
@@ -24,10 +37,10 @@ export class FavoritesService {
     return favorites;
   }
 
-  async addToToFavorites(id: string, section: string) {
+  async addToFavorites(id: string, section: string) {
     await checkUUID(id);
     switch (section) {
-      case 'artist': {
+      case 'artists': {
         try {
           const artist = await this.artistService.getArtist(id);
           const { createdAt, updatedAt, version, ...result } = artist;
@@ -40,7 +53,7 @@ export class FavoritesService {
           );
         }
       }
-      case 'album': {
+      case 'albums': {
         try {
           const album = await this.albumService.getAlbum(id);
           const { createdAt, updatedAt, version, ...result } = album;
@@ -53,7 +66,7 @@ export class FavoritesService {
           );
         }
       }
-      case 'track': {
+      case 'tracks': {
         try {
           const track = await this.trackService.getTrack(id);
           const { createdAt, updatedAt, version, ...result } = track;
@@ -71,16 +84,16 @@ export class FavoritesService {
     }
   }
 
-  async deleteFavorites(id: string, section: string) {
+  async deleteFromFavorites(id: string, section: string) {
     await checkUUID(id);
     switch (section) {
-      case 'artist':
+      case 'artists':
         await this.remove(id, 'artists');
         break;
-      case 'album':
+      case 'albums':
         await this.remove(id, 'albums');
         break;
-      case 'track':
+      case 'tracks':
         await this.remove(id, 'tracks');
         break;
       default:
@@ -88,8 +101,8 @@ export class FavoritesService {
     }
   }
 
-  async remove(id: string, from: string) {
-    const index = favorites[from].findIndex((el) => el.id === id);
+  async remove(id: string, section: string) {
+    const index = favorites[section].findIndex((el) => el.id === id);
 
     if (index === -1) {
       throw new HttpException(
@@ -99,7 +112,7 @@ export class FavoritesService {
     }
 
     if (index > -1) {
-      favorites[from].splice(index, 1);
+      favorites[section].splice(index, 1);
     }
   }
 }
