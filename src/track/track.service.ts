@@ -61,7 +61,6 @@ export class TrackService {
           tracks[track].artistId = data.artistId;
           tracks[track].albumId = data.albumId;
           tracks[track].duration = data.duration;
-          tracks[track].version += 1;
           tracks[track].updatedAt = Date.now();
 
           return tracks[track];
@@ -82,7 +81,6 @@ export class TrackService {
             tracks[element].albumId = null;
           }
         }
-        tracks[element].version += 1;
         tracks[element].updatedAt = Date.now();
       }
     }

@@ -63,7 +63,6 @@ export class AlbumService {
           albums[album].name = data.name;
           albums[album].year = data.year;
           albums[album].artistId = data.artistId;
-          albums[album].version += 1;
           albums[album].updatedAt = Date.now();
 
           return albums[album];
