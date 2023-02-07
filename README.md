@@ -8,13 +8,13 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/AlexXG0152/NodeJS-REST-Service
 ```
 
 ## Installing NPM modules
 
 ```
-npm install
+npm install 
 ```
 
 ## Running application
@@ -54,6 +54,8 @@ To run only specific test suite with authorization
 ```
 npm run test:auth -- <path to suite>
 ```
+
+Also I'm added postman quries collection - so you can use postman to test and check how it works.
 
 ### Auto-fix and format
 
