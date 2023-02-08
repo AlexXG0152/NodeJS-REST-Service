@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Album {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  year      Int
+  artistId  String    @unique @db.Uuid
+  artist    Artist    @relation(references: [id], fields: [artistId])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  track     Track[]
+  favorite  Favorite? @relation(fields: [id], references: [albumId])
+}
+
+model Artist {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  grammy    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  favorite  Favorite? @relation(fields: [id], references: [artistId])
+  album     Album[]
+  track     Track[]
+}
+
+model Track {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  artistId  String?   @unique @db.Uuid
+  artist    Artist?   @relation(references: [id], fields: [artistId])
+  albumId   String?   @unique @db.Uuid
+  album     Album?    @relation(references: [id], fields: [albumId])
+  duration  Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  favorite  Favorite? @relation(fields: [id], references: [trackId])
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  login     String   @unique
+  password  String
+  version   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Favorite {
+  artists  Artist[] 
+  artistId String   @unique @db.Uuid
+  albums   Album[]
+  albumId  String   @unique @db.Uuid
+  tracks   Track[]
+  trackId  String   @unique @db.Uuid
+
+  // @@id([artistId, albumId, trackId])
+}

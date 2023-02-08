@@ -1,3 +1,4 @@
+import { PrismaModule } from './prisma/prisma.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -11,6 +12,7 @@ import { FavoriteModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
+    PrismaModule,
     UserModule,
     ArtistModule,
     AlbumModule,
@@ -18,7 +20,14 @@ import { FavoriteModule } from './favorites/favorites.module';
     FavoriteModule,
     ConfigModule.forRoot(),
   ],
-  exports: [UserModule, ArtistModule, AlbumModule, TrackModule, FavoriteModule],
+  exports: [
+    PrismaModule,
+    UserModule,
+    ArtistModule,
+    AlbumModule,
+    TrackModule,
+    FavoriteModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

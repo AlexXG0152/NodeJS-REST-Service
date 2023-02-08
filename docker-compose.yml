@@ -1,0 +1,26 @@
+version: '4.16.3'
+services:
+  homelibrary-db:
+    image: postgres:latest
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespw
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PORT: 32768
+      POSTGRES_HOST: host.docker.internal
+      POSTGRES_DB: nest
+    networks:
+      - rsschool
+    # volumes:
+    #   - data:/var/lib/postgresql
+
+networks:
+ rsschool:
+ 
+# volumes:
+#   postgres-data:
+
+# myapp:
+#     image: [YOUR-APP-IMAGE]

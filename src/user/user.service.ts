@@ -5,20 +5,24 @@ import { IUser } from './user.interface';
 import { UpdatePasswordDto } from './dto/updateUser.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
+import { PrismaService } from 'src/prisma/prisma.service';
 
-const users: IUser[] = [];
+// const users: IUser[] = [];
 
 @Injectable({})
 export class UserService {
+  constructor(private prisma: PrismaService) {}
+
   async getUsers() {
-    return users;
+    try {
+      return await this.prisma.user.findMany();
+    } catch (error) {}
   }
 
   async getUser(id: string) {
     await checkUUID(id);
-
     try {
-      return await cheskIsExists(id, users);
+      return await cheskIsExists(id, this.prisma);
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -26,52 +30,67 @@ export class UserService {
 
   async createUser(user: CreateUserDto) {
     try {
-      const dbServiceInfo = {
-        id: uuidv4(),
-        version: 1,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      };
+      // const dbServiceInfo = {
+      //   id: uuidv4(),
+      //   version: 1,
+      //   createdAt: Date.now(),
+      //   updatedAt: Date.now(),
+      // };
 
-      users.push({ ...user, ...dbServiceInfo });
+      // const data = { ...user, ...dbServiceInfo };
 
-      delete user.password;
-      return { ...user, ...dbServiceInfo };
+      return await this.prisma.user.create({ data: user });
+
+      // users.push({ ...user, ...dbServiceInfo });
+
+      // delete user.password;
+      // return { ...user, ...dbServiceInfo };
     } catch (error) {}
   }
 
   async updateUser(id: string, data: UpdatePasswordDto) {
-    await checkUUID(id);
+    try {
+      await checkUUID(id);
+      // await cheskIsExists(id, this.prisma);
+      return await this.prisma.user.update({
+        where: { id },
+        data: {
+          password: data.newPassword,
+          version: { increment: 1 },
+        },
+      });
+    } catch (error) {}
 
-    await cheskIsExists(id, users);
-
-    for (const user in users) {
-      if (Object.prototype.hasOwnProperty.call(users, user)) {
-        if (users[user].id === id) {
-          if (users[user].password === data.newPassword) {
-            throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
-          }
-          users[user].version += 1;
-          users[user].password = data.newPassword;
-          users[user].updatedAt = Date.now();
-          const { password, ...rest } = users[user];
-          return rest;
-        }
-      }
-    }
+    // for (const user in users) {
+    //   if (Object.prototype.hasOwnProperty.call(users, user)) {
+    //     if (users[user].id === id) {
+    //       if (users[user].password === data.newPassword) {
+    //         throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
+    //       }
+    //       users[user].version += 1;
+    //       users[user].password = data.newPassword;
+    //       users[user].updatedAt = Date.now();
+    //       const { password, ...rest } = users[user];
+    //       return rest;
+    //     }
+    //   }
+    // }
   }
 
   async deleteUser(id: string) {
-    await checkUUID(id);
+    try {
+      await checkUUID(id);
+      return await this.prisma.user.delete({ where: { id } });
+    } catch (error) {}
 
-    const userIndex = users.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
-      throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
+    // const userIndex = users.findIndex((user) => user.id === id);
+    // if (userIndex === -1) {
+    //   throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
+    // }
 
-    if (userIndex > -1) {
-      users.splice(userIndex, 1);
-    }
-    return HttpStatus.CREATED;
+    // if (userIndex > -1) {
+    //   users.splice(userIndex, 1);
+    // }
+    // return HttpStatus.CREATED;
   }
 }

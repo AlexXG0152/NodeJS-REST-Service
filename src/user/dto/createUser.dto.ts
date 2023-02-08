@@ -10,7 +10,7 @@ export class CreateUserDto implements ICreateUserDto {
   login: string;
   @MinLength(1)
   password: string;
-  version: number;
-  createdAt: number;
-  updatedAt: number;
+  // version: number;
+  // createdAt: number;
+  // updatedAt: number;
 }
