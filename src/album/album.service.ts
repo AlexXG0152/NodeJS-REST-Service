@@ -36,7 +36,7 @@ export class AlbumService {
   async getAlbum(id: string) {
     await checkUUID(id);
     try {
-      return await cheskIsExists(id, this.prisma);
+      return await cheskIsExists(id, this.prisma.album);
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
@@ -58,40 +58,56 @@ export class AlbumService {
   }
 
   async updateAlbum(id: string, data: AlbumDto) {
-    await checkUUID(id);
+    try {
+      await checkUUID(id);
+      return await this.prisma.album.update({
+        where: { id },
+        data: {
+          name: data.name,
+          year: data.year,
+          artistId: data?.artistId,
+        },
+      });
+    } catch (error) {}
+    // await checkUUID(id);
 
-    await cheskIsExists(id, albums);
+    // await cheskIsExists(id, albums);
 
-    for (const album in albums) {
-      if (Object.prototype.hasOwnProperty.call(albums, album)) {
-        if (albums[album].id === id) {
-          albums[album].name = data.name;
-          albums[album].year = data.year;
-          albums[album].artistId = data.artistId;
-          albums[album].updatedAt = Date.now();
+    // for (const album in albums) {
+    //   if (Object.prototype.hasOwnProperty.call(albums, album)) {
+    //     if (albums[album].id === id) {
+    //       albums[album].name = data.name;
+    //       albums[album].year = data.year;
+    //       albums[album].artistId = data.artistId;
+    //       albums[album].updatedAt = Date.now();
 
-          return albums[album];
-        }
-      }
-    }
+    //       return albums[album];
+    //     }
+    //   }
+    // }
   }
 
   async deleteAlbum(id: string) {
-    await checkUUID(id);
-
     try {
-      await this.trackService.updateManyTracksAfterDelete(id, 'album');
-      await this.favoritesService.deleteFromFavorites(id, 'albums');
+      await checkUUID(id);
+      return await this.prisma.album.delete({ where: { id } });
     } catch (error) {}
 
-    const albumIndex = albums.findIndex((album) => album.id === id);
-    if (albumIndex === -1) {
-      throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
-    }
+    //   await checkUUID(id);
 
-    if (albumIndex > -1) {
-      albums.splice(albumIndex, 1);
-    }
-    return 'HttpStatus.NO_CONTENT';
+    //   try {
+    //     await this.trackService.updateManyTracksAfterDelete(id, 'album');
+    //     await this.favoritesService.deleteFromFavorites(id, 'albums');
+    //   } catch (error) {}
+
+    //   const albumIndex = albums.findIndex((album) => album.id === id);
+    //   if (albumIndex === -1) {
+    //     throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
+    //   }
+
+    //   if (albumIndex > -1) {
+    //     albums.splice(albumIndex, 1);
+    //   }
+    //   return 'HttpStatus.NO_CONTENT';
   }
 }

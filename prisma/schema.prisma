@@ -14,12 +14,12 @@ model Album {
   id        String    @id @default(uuid()) @db.Uuid
   name      String
   year      Int
-  artistId  String    @unique @db.Uuid
+  artistId  String?    @unique @db.Uuid
   // artist    Artist    @relation(references: [id], fields: [artistId])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   // track     Track[]
-  favorite  Favorite? @relation(fields: [id], references: [albumId])
+  // favorite  Favorite? @relation(fields: [id], references: [albumId])
 }
 
 model Artist {
@@ -43,7 +43,7 @@ model Track {
   duration  Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  favorite  Favorite? @relation(fields: [id], references: [trackId])
+  // favorite  Favorite? @relation(fields: [id], references: [trackId])
 }
 
 model User {
@@ -55,13 +55,13 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-model Favorite {
-  // artists  Artist? 
-  // artistId String  @unique @db.Uuid
-  albums   Album?
-  albumId  String  @unique @db.Uuid
-  tracks   Track?
-  trackId  String  @unique @db.Uuid
+// model Favorite {
+//   artists  Artist? 
+//   artistId String  @unique @db.Uuid
+//   albums   Album?
+//   albumId  String  @unique @db.Uuid
+//   tracks   Track?
+//   trackId  String  @unique @db.Uuid
 
-  // @@id([artistId, albumId, trackId])
-}
+//   @@id([artistId, albumId, trackId])
+// }
