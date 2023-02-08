@@ -7,14 +7,14 @@ import {
 } from '@nestjs/common';
 // import { v4 as uuidv4 } from 'uuid';
 
-import { IArtist } from './artist.interface';
+// import { IArtist } from './artist.interface';
 import { ArtistDto } from './dto/artist.dto';
 import { TrackService } from '../track/track.service';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
 import { FavoritesService } from 'src/favorites/favorites.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-const artists: IArtist[] = [];
+// const artists: IArtist[] = [];
 
 @Injectable()
 export class ArtistService {

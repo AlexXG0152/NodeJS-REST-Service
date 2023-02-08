@@ -5,16 +5,16 @@ import {
   Injectable,
   forwardRef,
 } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 
 import { AlbumDto } from './dto/album.dto';
-import { IAlbum } from './album.interface';
+// import { IAlbum } from './album.interface';
 import { TrackService } from 'src/track/track.service';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
 import { FavoritesService } from 'src/favorites/favorites.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-const albums: IAlbum[] = [];
+// const albums: IAlbum[] = [];
 
 @Injectable()
 export class AlbumService {
