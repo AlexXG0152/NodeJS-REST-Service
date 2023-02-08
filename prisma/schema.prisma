@@ -15,10 +15,10 @@ model Album {
   name      String
   year      Int
   artistId  String    @unique @db.Uuid
-  artist    Artist    @relation(references: [id], fields: [artistId])
+  // artist    Artist    @relation(references: [id], fields: [artistId])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  track     Track[]
+  // track     Track[]
   favorite  Favorite? @relation(fields: [id], references: [albumId])
 }
 
@@ -28,18 +28,18 @@ model Artist {
   grammy    Boolean   @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  favorite  Favorite? @relation(fields: [id], references: [artistId])
-  album     Album[]
-  track     Track[]
+  // favorite  Favorite? @relation(fields: [id], references: [artistId])
+  // album     Album?    @relation(references: [id], fields: [albumId])
+  // track     Track?    @relation(references: [id], fields: [trackId])
 }
 
 model Track {
   id        String    @id @default(uuid()) @db.Uuid
   name      String
   artistId  String?   @unique @db.Uuid
-  artist    Artist?   @relation(references: [id], fields: [artistId])
+  // artist    Artist?   @relation(references: [id], fields: [artistId])
   albumId   String?   @unique @db.Uuid
-  album     Album?    @relation(references: [id], fields: [albumId])
+  // album     Album?    @relation(references: [id], fields: [albumId])
   duration  Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -56,12 +56,12 @@ model User {
 }
 
 model Favorite {
-  artists  Artist[] 
-  artistId String   @unique @db.Uuid
-  albums   Album[]
-  albumId  String   @unique @db.Uuid
-  tracks   Track[]
-  trackId  String   @unique @db.Uuid
+  // artists  Artist? 
+  // artistId String  @unique @db.Uuid
+  albums   Album?
+  albumId  String  @unique @db.Uuid
+  tracks   Track?
+  trackId  String  @unique @db.Uuid
 
   // @@id([artistId, albumId, trackId])
 }

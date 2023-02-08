@@ -8,7 +8,7 @@ export async function checkUUID(id: string) {
 }
 
 export async function cheskIsExists(id: string, prisma: any) {
-  const result = await prisma.user.findUnique({
+  const result = await prisma.findUnique({
     where: {
       id: id,
     },

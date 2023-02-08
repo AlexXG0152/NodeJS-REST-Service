@@ -12,6 +12,7 @@ import { IAlbum } from './album.interface';
 import { TrackService } from 'src/track/track.service';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
 import { FavoritesService } from 'src/favorites/favorites.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 const albums: IAlbum[] = [];
 
@@ -22,33 +23,37 @@ export class AlbumService {
     private favoritesService: FavoritesService,
     @Inject(forwardRef(() => TrackService))
     private trackService: TrackService,
+    // @Inject(forwardRef(() => PrismaService))
+    private prisma: PrismaService,
   ) {}
 
   async getAlbums() {
-    return albums;
+    try {
+      return await this.prisma.album.findMany();
+    } catch (error) {}
   }
 
   async getAlbum(id: string) {
     await checkUUID(id);
-
     try {
-      return await cheskIsExists(id, albums);
+      return await cheskIsExists(id, this.prisma);
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
   }
   async createAlbum(album: AlbumDto) {
     try {
-      const dbServiceInfo = {
-        id: uuidv4(),
-        version: 1,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      };
+      // const dbServiceInfo = {
+      //   id: uuidv4(),
+      //   version: 1,
+      //   createdAt: Date.now(),
+      //   updatedAt: Date.now(),
+      // };
 
-      albums.push({ ...album, ...dbServiceInfo });
+      // albums.push({ ...album, ...dbServiceInfo });
 
-      return { ...album, ...dbServiceInfo };
+      // return { ...album, ...dbServiceInfo };
+      return await this.prisma.album.create({ data: album });
     } catch (error) {}
   }
 

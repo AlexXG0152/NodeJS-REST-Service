@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 
-import { IUser } from './user.interface';
+// import { IUser } from './user.interface';
 import { UpdatePasswordDto } from './dto/updateUser.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
@@ -22,7 +22,7 @@ export class UserService {
   async getUser(id: string) {
     await checkUUID(id);
     try {
-      return await cheskIsExists(id, this.prisma);
+      return await cheskIsExists(id, this.prisma.user);
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
