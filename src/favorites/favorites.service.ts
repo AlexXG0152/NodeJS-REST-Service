@@ -1,115 +1,167 @@
 import {
   HttpException,
   HttpStatus,
-  Inject,
+  // Inject,
   Injectable,
-  forwardRef,
+  // forwardRef,
 } from '@nestjs/common';
 
 import { IFavoritesRepsonse, sectionType } from './favorites.interface';
 import { checkUUID } from 'src/helpers/checkers';
-import { AlbumService } from 'src/album/album.service';
-import { ArtistService } from 'src/artist/artist.service';
-import { TrackService } from 'src/track/track.service';
+// import { AlbumService } from 'src/album/album.service';
+// import { ArtistService } from 'src/artist/artist.service';
+// import { TrackService, tracks } from 'src/track/track.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+// import { Favorite } from '@prisma/client';
 
-export const favorites: IFavoritesRepsonse = {
-  artists: [],
-  albums: [],
-  tracks: [],
-};
+// export const favorites: IFavoritesRepsonse = {
+//   artist: [],
+//   album: [],
+//   track: [],
+// };
 
 @Injectable({})
 export class FavoritesService {
   constructor(
-    @Inject(forwardRef(() => ArtistService))
-    private artistService: ArtistService,
-    @Inject(forwardRef(() => AlbumService))
-    private albumService: AlbumService,
-    @Inject(forwardRef(() => TrackService))
-    private trackService: TrackService,
+    // @Inject(forwardRef(() => ArtistService))
+    // private artistService: ArtistService,
+    // @Inject(forwardRef(() => AlbumService))
+    // private albumService: AlbumService,
+    // @Inject(forwardRef(() => TrackService))
+    // private trackService: TrackService,
+    private prisma: PrismaService,
   ) {}
-  async getAllFavorites(): Promise<IFavoritesRepsonse> {
-    return favorites;
+
+  async getAllFavoritesCollections(): Promise<any> {
+    try {
+      return await this.prisma.favorite.findMany({
+        include: { artist: true, album: true, track: true },
+      });
+    } catch (error) {}
   }
 
-  async addToFavorites(id: string, section: sectionType) {
+  async getOneFavoriteCollection(id: string) {
+    try {
+      return await this.prisma.favorite.findUnique({
+        where: { id },
+        include: { artist: true, album: true, track: true },
+      });
+    } catch (error) {}
+  }
+
+  async createFavoritesCollection(id: string) {
     await checkUUID(id);
-    switch (section) {
-      case 'artists': {
-        try {
-          const artist = await this.artistService.getArtist(id);
-          const { createdAt, updatedAt, version, ...result } = artist;
-          favorites.artists.push(result);
-          break;
-        } catch (error) {
-          throw new HttpException(
-            'UNPROCESSABLE_ENTITY',
-            HttpStatus.UNPROCESSABLE_ENTITY,
-          );
-        }
-      }
-      case 'albums': {
-        try {
-          const album = await this.albumService.getAlbum(id);
-          const { createdAt, updatedAt, version, ...result } = album;
-          favorites.albums.push(result);
-          break;
-        } catch (error) {
-          throw new HttpException(
-            'UNPROCESSABLE_ENTITY',
-            HttpStatus.UNPROCESSABLE_ENTITY,
-          );
-        }
-      }
-      case 'tracks': {
-        try {
-          const track = await this.trackService.getTrack(id);
-          const { createdAt, updatedAt, version, ...result } = track;
-          favorites.tracks.push(result);
-          break;
-        } catch (error) {
-          throw new HttpException(
-            'UNPROCESSABLE_ENTITY',
-            HttpStatus.UNPROCESSABLE_ENTITY,
-          );
-        }
-      }
-      default:
-        const unknownSection: never = section;
-        throw new Error(`Unknown section ${unknownSection}`);
-    }
-  }
-
-  async deleteFromFavorites(id: string, section: sectionType) {
-    await checkUUID(id);
-    switch (section) {
-      case 'artists':
-        await this.remove(id, 'artists');
-        break;
-      case 'albums':
-        await this.remove(id, 'albums');
-        break;
-      case 'tracks':
-        await this.remove(id, 'tracks');
-        break;
-      default:
-        const unknownSection: never = section;
-        throw new Error(`Unknown section ${unknownSection}`);
-    }
-  }
-
-  async remove(id: string, section: string) {
-    const index = favorites[section].findIndex((el) => el.id === id);
-
-    if (index === -1) {
+    try {
+      return await this.prisma.favorite.create({
+        data: {},
+        include: { artist: true, album: true, track: true },
+      });
+    } catch (error) {
       throw new HttpException(
         'UNPROCESSABLE_ENTITY',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-
-    if (index > -1) {
-      favorites[section].splice(index, 1);
-    }
   }
+
+  async addToFavorites(id: string, section: string, fav: any) {
+    try {
+      switch (section) {
+        case 'artist':
+          return await this.prisma.favorite.update({
+            where: { id },
+            data: {
+              artist: {
+                connect: { id: fav.id },
+              },
+            },
+            include: { artist: true },
+          });
+
+        case 'album':
+          return await this.prisma.favorite.update({
+            where: { id },
+            data: {
+              album: {
+                connect: { id: fav.id },
+              },
+            },
+            include: { album: true },
+          });
+
+        case 'track':
+          return await this.prisma.favorite.update({
+            where: { id },
+            data: {
+              track: {
+                connect: { id: fav.id },
+              },
+            },
+            include: { track: true },
+          });
+
+        default:
+          const unknownSection = section;
+          throw new Error(`Unknown section ${unknownSection}`);
+      }
+    } catch (error) {}
+  }
+
+  async deleteFromFavorites(id: string, section: string, fav: any) {
+    try {
+      switch (section) {
+        case 'artist':
+          return await this.prisma.favorite.update({
+            where: { id },
+            data: {
+              artist: {
+                disconnect: { id: fav.id },
+              },
+            },
+            include: { artist: true },
+          });
+
+        case 'album':
+          return await this.prisma.favorite.update({
+            where: { id },
+            data: {
+              album: {
+                disconnect: { id: fav.id },
+              },
+            },
+            include: { album: true },
+          });
+
+        case 'track':
+          return await this.prisma.favorite.update({
+            where: { id },
+            data: {
+              track: {
+                disconnect: { id: fav.id },
+              },
+            },
+            include: { track: true },
+          });
+
+        default:
+          const unknownSection = section;
+          throw new Error(`Unknown section ${unknownSection}`);
+      }
+    } catch (error) {}
+  }
+
+  // async remove(id: string, section: string) {
+  //   const index = favorites[section].findIndex((el) => el.id === id);
+
+  //   if (index === -1) {
+  //     throw new HttpException(
+  //       'UNPROCESSABLE_ENTITY',
+  //       HttpStatus.UNPROCESSABLE_ENTITY,
+  //     );
+  //   }
+
+  //   if (index > -1) {
+  //     favorites[section].splice(index, 1);
+  //   }
+  // }
 }

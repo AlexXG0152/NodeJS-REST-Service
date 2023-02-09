@@ -115,7 +115,7 @@ export class TrackService {
 
   async deleteTrack(id: string) {
     try {
-      await checkUUID(id);
+      // await checkUUID(id);
       return await this.prisma.track.delete({ where: { id } });
     } catch (error) {}
     // await checkUUID(id);

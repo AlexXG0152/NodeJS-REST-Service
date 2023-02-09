@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -8,6 +9,9 @@ import {
   Post,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
+import { TrackDto } from 'src/track/dto/track.dto';
+import { AlbumDto } from 'src/album/dto/album.dto';
+import { ArtistDto } from 'src/artist/dto/artist.dto';
 
 @Controller('favs')
 export class FavoritesController {
@@ -15,42 +19,56 @@ export class FavoritesController {
 
   @Get('/')
   async getAllFavorites() {
-    return this.favoritesService.getAllFavorites();
+    return this.favoritesService.getAllFavoritesCollections();
+  }
+
+  @Get('/:id')
+  async getOneFavorite(@Param('id') id: string) {
+    return this.favoritesService.getOneFavoriteCollection(id);
   }
 
   @Post('track/:id')
   @HttpCode(HttpStatus.CREATED)
-  async createOneTrackFavorites(@Param('id') id: string) {
-    return this.favoritesService.addToFavorites(id, 'tracks');
+  async addOneTrackToFavs(@Param('id') id: string, @Body() favs: string) {
+    return this.favoritesService.addToFavorites(id, 'track', favs);
   }
 
   @Post('album/:id')
   @HttpCode(HttpStatus.CREATED)
-  async createOneAlbumFavorites(@Param('id') id: string) {
-    return this.favoritesService.addToFavorites(id, 'albums');
+  async addOneAlbumToFavs(@Param('id') id: string, @Body() favs: string) {
+    return this.favoritesService.addToFavorites(id, 'album', favs);
   }
 
   @Post('artist/:id')
   @HttpCode(HttpStatus.CREATED)
-  async createOneArtistFavorites(@Param('id') id: string) {
-    return this.favoritesService.addToFavorites(id, 'artists');
+  async addOneArtistToFavs(@Param('id') id: string, @Body() favs: string) {
+    return this.favoritesService.addToFavorites(id, 'artist', favs);
   }
 
   @Delete('track/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteTrackFavorites(@Param('id') id: string) {
-    return this.favoritesService.deleteFromFavorites(id, 'tracks');
+  async deleteTrackFromFavorites(
+    @Param('id') id: string,
+    @Body() favs: string,
+  ) {
+    return this.favoritesService.deleteFromFavorites(id, 'track', favs);
   }
 
   @Delete('album/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteOneAlbumFavorites(@Param('id') id: string) {
-    return this.favoritesService.deleteFromFavorites(id, 'albums');
+  async deleteOneAlbumFromFavorites(
+    @Param('id') id: string,
+    @Body() favs: string,
+  ) {
+    return this.favoritesService.deleteFromFavorites(id, 'album', favs);
   }
 
   @Delete('artist/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteOneArtistFavorites(@Param('id') id: string) {
-    return this.favoritesService.deleteFromFavorites(id, 'artists');
+  async deleteOneArtistFromFavorites(
+    @Param('id') id: string,
+    @Body() favs: string,
+  ) {
+    return this.favoritesService.deleteFromFavorites(id, 'artist', favs);
   }
 }

@@ -3,18 +3,19 @@ import { IArtist } from 'src/artist/artist.interface';
 import { ITrack } from 'src/track/track.interface';
 
 export interface IFavorites {
-  artists: string[]; // favorite artists ids
-  albums: string[]; // favorite albums ids
-  tracks: string[]; // favorite tracks ids
-  version: number; // integer number, increments on update
-  createdAt: number; // timestamp of creation
-  updatedAt: number; // timestamp of last update
+  // id: string;
+  artist?: string[]; // favorite artists ids
+  album?: string[]; // favorite albums ids
+  track?: string[]; // favorite tracks ids
+  // version: number; // integer number, increments on update
+  // createdAt: number; // timestamp of creation
+  // updatedAt: number; // timestamp of last update
 }
 
 export interface IFavoritesRepsonse {
-  artists: IArtist[];
-  albums: IAlbum[];
-  tracks: ITrack[];
+  artist?: [];
+  album?: [];
+  track?: [];
 }
 
-export type sectionType = 'artists' | 'albums' | 'tracks';
+export type sectionType = 'artist' | 'album' | 'track';
