@@ -9,9 +9,6 @@ import {
   Post,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
-import { TrackDto } from 'src/track/dto/track.dto';
-import { AlbumDto } from 'src/album/dto/album.dto';
-import { ArtistDto } from 'src/artist/dto/artist.dto';
 
 @Controller('favs')
 export class FavoritesController {

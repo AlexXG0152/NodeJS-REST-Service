@@ -13,7 +13,6 @@ export async function cheskIsExists(id: string, prisma: any) {
       id: id,
     },
   });
-  // const result = data.find((element: { id: string }) => element.id === id);
   if (!result) {
     throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
   }

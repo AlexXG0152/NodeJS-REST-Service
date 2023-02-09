@@ -1,24 +1,7 @@
-import {
-  HttpException,
-  HttpStatus,
-  // Inject,
-  Injectable,
-  // forwardRef,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-import { IFavoritesRepsonse, sectionType } from './favorites.interface';
 import { checkUUID } from 'src/helpers/checkers';
-// import { AlbumService } from 'src/album/album.service';
-// import { ArtistService } from 'src/artist/artist.service';
-// import { TrackService, tracks } from 'src/track/track.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-// import { Favorite } from '@prisma/client';
-
-// export const favorites: IFavoritesRepsonse = {
-//   artist: [],
-//   album: [],
-//   track: [],
-// };
 
 @Injectable({})
 export class FavoritesService {
@@ -149,19 +132,4 @@ export class FavoritesService {
       }
     } catch (error) {}
   }
-
-  // async remove(id: string, section: string) {
-  //   const index = favorites[section].findIndex((el) => el.id === id);
-
-  //   if (index === -1) {
-  //     throw new HttpException(
-  //       'UNPROCESSABLE_ENTITY',
-  //       HttpStatus.UNPROCESSABLE_ENTITY,
-  //     );
-  //   }
-
-  //   if (index > -1) {
-  //     favorites[section].splice(index, 1);
-  //   }
-  // }
 }

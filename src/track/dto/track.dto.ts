@@ -13,14 +13,7 @@ export class TrackDto implements ITrackDto {
   @IsNotEmpty()
   name: string;
 
-  // @MinLength(1)
-  // @IsString()
-  // @IsNotEmpty()
   artistId: string;
-
-  // @MinLength(1)
-  // @IsString()
-  // @IsNotEmpty()
   albumId: string;
 
   @Min(0)
