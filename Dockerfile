@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json /app
 COPY prisma ./prisma/ 
 
-RUN npm install
+RUN npm install --omit=dev
 RUN npx prisma generate
 
 COPY . .
