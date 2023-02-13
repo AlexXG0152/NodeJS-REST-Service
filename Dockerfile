@@ -1,11 +1,17 @@
-FROM node:18
-WORKDIR /usr/src/app
+FROM node:18-alpine
 
-COPY package*.json ./
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /app 
+
+COPY package*.json /app
+COPY prisma ./prisma/ 
 
 RUN npm install
+RUN npx prisma generate
 
 COPY . .
+
 EXPOSE 4000
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:migrate:dev"]

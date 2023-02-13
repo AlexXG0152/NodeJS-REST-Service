@@ -1,2 +1,17 @@
 node_modules
+pgdata
+coverage
+dist
 npm-debug.log
+graphql
+test
+
+
+
+.vscode/
+.git
+npm-debug.log
+.coverage
+.coverage.*
+.env
+.aws
