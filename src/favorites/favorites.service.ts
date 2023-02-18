@@ -24,6 +24,7 @@ export class FavoritesService {
   }
 
   async getOneFavoriteCollection(id: string) {
+    await checkUUID(id);
     try {
       return await this.prisma.favorite.findUnique({
         where: { id },
@@ -48,6 +49,7 @@ export class FavoritesService {
   }
 
   async addToFavorites(id: string, section: string, fav: any) {
+    await checkUUID(id);
     try {
       switch (section) {
         case 'artist':
@@ -91,6 +93,7 @@ export class FavoritesService {
   }
 
   async deleteFromFavorites(id: string, section: string, fav: any) {
+    await checkUUID(id);
     try {
       switch (section) {
         case 'artist':

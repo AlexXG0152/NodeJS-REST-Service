@@ -3,6 +3,7 @@ import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 export interface IUpdatePasswordDto {
   oldPassword: string; // previous password
   newPassword: string; // new password
+  updatedAt: number;
 }
 
 export class UpdatePasswordDto implements IUpdatePasswordDto {
@@ -14,4 +15,6 @@ export class UpdatePasswordDto implements IUpdatePasswordDto {
   @IsString()
   @IsNotEmpty()
   newPassword: string;
+
+  updatedAt: number;
 }

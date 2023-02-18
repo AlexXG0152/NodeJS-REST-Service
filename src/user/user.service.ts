@@ -33,6 +33,10 @@ export class UserService {
         data: {
           login: data.login,
           password: data.password,
+          createdAt: Math.floor(Date.now() / 1000),
+          updatedAt: Math.floor(Date.now() / 1000),
+          // createdAt: BigInt(Date.now()),
+          // updatedAt: BigInt(Date.now()),
         },
       });
       delete user.password;
@@ -42,15 +46,23 @@ export class UserService {
 
   async updateUser(id: string, data: UpdatePasswordDto) {
     await checkUUID(id);
-    await cheskIsExists(id, this.prisma.user);
+
+    const oldData = await cheskIsExists(id, this.prisma.user);
+    if (oldData.password === data.newPassword) {
+      throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
+    }
+
     try {
-      return await this.prisma.user.update({
+      const user = await this.prisma.user.update({
         where: { id },
         data: {
           password: data.newPassword,
           version: { increment: 1 },
+          updatedAt: Math.floor(Date.now() / 1010),
         },
       });
+      delete user.password;
+      return user;
     } catch (error) {}
   }
 
