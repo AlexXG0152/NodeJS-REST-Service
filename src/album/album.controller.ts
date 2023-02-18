@@ -9,6 +9,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+
 import { AlbumService } from './album.service';
 import { AlbumDto } from './dto/album.dto';
 

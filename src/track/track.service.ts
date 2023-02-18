@@ -26,15 +26,16 @@ export class TrackService {
     }
   }
 
-  async createTrack(id: string, data: TrackDto) {
+  async createTrack(data: TrackDto) {
     try {
       return await this.prisma.track.create({ data });
     } catch (error) {}
   }
 
   async updateTrack(id: string, data: TrackDto) {
+    await checkUUID(id);
+    await cheskIsExists(id, this.prisma.track);
     try {
-      await checkUUID(id);
       return await this.prisma.track.update({
         where: { id },
         data: {
@@ -48,6 +49,8 @@ export class TrackService {
   }
 
   async deleteTrack(id: string) {
+    await checkUUID(id);
+    await cheskIsExists(id, this.prisma.track);
     try {
       return await this.prisma.track.delete({ where: { id } });
     } catch (error) {}

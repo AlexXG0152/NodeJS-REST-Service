@@ -23,7 +23,6 @@ export class ArtistService {
 
   async getArtist(id: string) {
     await checkUUID(id);
-
     try {
       return await cheskIsExists(id, this.prisma.artist);
     } catch (error) {
@@ -37,8 +36,9 @@ export class ArtistService {
   }
 
   async updateArtist(id: string, data: ArtistDto) {
+    await checkUUID(id);
+    await cheskIsExists(id, this.prisma.artist);
     try {
-      await checkUUID(id);
       await cheskIsExists(id, this.prisma.artist);
       return await this.prisma.artist.update({
         where: { id },
@@ -48,8 +48,9 @@ export class ArtistService {
   }
 
   async deleteArtist(id: string) {
+    await checkUUID(id);
+    await cheskIsExists(id, this.prisma.artist);
     try {
-      await checkUUID(id);
       return await this.prisma.artist.delete({ where: { id } });
     } catch (error) {}
   }

@@ -29,29 +29,32 @@ export class AlbumService {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
   }
+
   async createAlbum(album: AlbumDto) {
     try {
       return await this.prisma.album.create({ data: album });
     } catch (error) {}
   }
 
-  async updateAlbum(id: string, data: AlbumDto) {
+  async updateAlbum(id: string, album: AlbumDto) {
+    await checkUUID(id);
+    await cheskIsExists(id, this.prisma.album);
     try {
-      await checkUUID(id);
       return await this.prisma.album.update({
         where: { id },
         data: {
-          name: data.name,
-          year: data.year,
-          artistId: data?.artistId,
+          name: album.name,
+          year: album.year,
+          artistId: album?.artistId,
         },
       });
     } catch (error) {}
   }
 
   async deleteAlbum(id: string) {
+    await checkUUID(id);
+    await cheskIsExists(id, this.prisma.album);
     try {
-      await checkUUID(id);
       return await this.prisma.album.delete({ where: { id } });
     } catch (error) {}
   }

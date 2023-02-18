@@ -29,8 +29,8 @@ export class TrackController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createOneTrack(@Param('id') id: string, @Body() track: TrackDto) {
-    return this.trackService.createTrack(id, track);
+  async createOneTrack(@Body() track: TrackDto) {
+    return this.trackService.createTrack(track);
   }
 
   @Put(':id')

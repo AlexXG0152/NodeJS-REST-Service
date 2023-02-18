@@ -17,22 +17,33 @@ export class UserService {
 
   async getUser(id: string) {
     await checkUUID(id);
+    await cheskIsExists(id, this.prisma.user);
     try {
-      return await cheskIsExists(id, this.prisma.user);
+      const user = await cheskIsExists(id, this.prisma.user);
+      delete user.password;
+      return user;
     } catch (error) {
       throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
     }
   }
 
-  async createUser(user: CreateUserDto) {
+  async createUser(data: CreateUserDto) {
     try {
-      return await this.prisma.user.create({ data: user });
+      const user = await this.prisma.user.create({
+        data: {
+          login: data.login,
+          password: data.password,
+        },
+      });
+      delete user.password;
+      return user;
     } catch (error) {}
   }
 
   async updateUser(id: string, data: UpdatePasswordDto) {
+    await checkUUID(id);
+    await cheskIsExists(id, this.prisma.user);
     try {
-      await checkUUID(id);
       return await this.prisma.user.update({
         where: { id },
         data: {
@@ -44,8 +55,9 @@ export class UserService {
   }
 
   async deleteUser(id: string) {
+    await checkUUID(id);
+    await cheskIsExists(id, this.prisma.user);
     try {
-      await checkUUID(id);
       return await this.prisma.user.delete({ where: { id } });
     } catch (error) {}
   }

@@ -1,4 +1,4 @@
-import { MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export interface ICreateUserDto {
   login: string;
@@ -6,8 +6,10 @@ export interface ICreateUserDto {
 }
 
 export class CreateUserDto implements ICreateUserDto {
-  @MinLength(1)
+  @IsNotEmpty()
+  @IsString()
   login: string;
-  @MinLength(1)
+  @IsNotEmpty()
+  @IsString()
   password: string;
 }

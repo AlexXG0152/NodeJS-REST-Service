@@ -34,8 +34,8 @@ model Artist {
 model Track {
   id        String    @id @default(uuid()) @db.Uuid
   name      String
-  artistId  String    @db.Uuid
-  albumId   String    @db.Uuid
+  artistId  String?   //@db.Uuid
+  albumId   String?   //@db.Uuid
   duration  Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -47,8 +47,8 @@ model Track {
 model User {
   id        String   @id @default(uuid()) @db.Uuid
   login     String   @unique
-  password  String
-  version   Int      @default(0)
+  password  String   
+  version   Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
