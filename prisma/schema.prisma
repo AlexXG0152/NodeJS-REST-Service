@@ -1,61 +1,57 @@
-generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl"]
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl"]
+}
+
 model Album {
-  id        String    @id @default(uuid()) @db.Uuid
+  id        String     @id @default(uuid())
   name      String
   year      Int
-  artistId  String?   
-  createdAt DateTime  @default(now()) 
-  updatedAt DateTime  @updatedAt
-  artist    Artist?   @relation(fields: [artistId], references: [id])
-  // tracks    Track[]   
+  artistId  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  artist    Artist?    @relation(fields: [artistId], references: [id])
   favorite  Favorite[]
 }
 
 model Artist {
-  id        String    @id @default(uuid()) @db.Uuid
+  id        String     @id @default(uuid())
   name      String
-  grammy    Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  grammy    Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   albums    Album[]
-  // tracks    Track[]
   favorite  Favorite[]
 }
 
 model Track {
-  id        String    @id @default(uuid()) @db.Uuid
+  id        String     @id @default(uuid()) @db.Uuid
   name      String
-  artistId  String?   //@db.Uuid
-  albumId   String?   //@db.Uuid
+  artistId  String?
+  albumId   String?
   duration  Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  // artist    Artist?   @relation(fields: [artistId], references: [id])
-  // album     Album?    @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   favorite  Favorite[]
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  login     String   @unique
-  password  String   
-  version   Int      @default(1)
+  id        String @id @default(uuid()) @db.Uuid
+  login     String @unique
+  password  String
+  version   Int    @default(1)
   createdAt Int
   updatedAt Int
 }
 
 model Favorite {
-  id        String   @id @default(uuid()) @db.Uuid
-  artist    Artist[] // @relation(fields: [artistID], references: [id])
-  album     Album[]  // @relation(fields: [albumId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  track     Track[]  // @relation(fields: [trackId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  id     String   @id @default(uuid())
+  artist Artist[]
+  album  Album[]
+  track  Track[]
 }
