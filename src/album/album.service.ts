@@ -53,9 +53,19 @@ export class AlbumService {
 
   async deleteAlbum(id: string) {
     await checkUUID(id);
-    await cheskIsExists(id, this.prisma.album);
+
+    const albumData = await cheskIsExists(id, this.prisma.album);
+
     try {
-      return await this.prisma.album.delete({ where: { id } });
-    } catch (error) {}
+      await this.prisma.album.delete({ where: { id } });
+      await this.prisma.track.updateMany({
+        where: { albumId: albumData.id },
+        data: {
+          albumId: null,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

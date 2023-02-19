@@ -50,8 +50,17 @@ export class ArtistService {
   async deleteArtist(id: string) {
     await checkUUID(id);
     await cheskIsExists(id, this.prisma.artist);
+
+    const artistData = await cheskIsExists(id, this.prisma.artist);
+
     try {
-      return await this.prisma.artist.delete({ where: { id } });
+      await this.prisma.artist.delete({ where: { id } });
+      await this.prisma.track.updateMany({
+        where: { artistId: artistData.id },
+        data: {
+          artistId: null,
+        },
+      });
     } catch (error) {}
   }
 }

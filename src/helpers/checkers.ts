@@ -14,7 +14,6 @@ export async function cheskIsExists(id: string, prisma: any) {
     },
   });
   if (!result) {
-    console.log('NOT_FOUND');
     throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
   }
   return result;
