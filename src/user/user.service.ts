@@ -35,8 +35,6 @@ export class UserService {
           password: data.password,
           createdAt: Math.floor(Date.now() / 1000),
           updatedAt: Math.floor(Date.now() / 1000),
-          // createdAt: BigInt(Date.now()),
-          // updatedAt: BigInt(Date.now()),
         },
       });
       delete user.password;

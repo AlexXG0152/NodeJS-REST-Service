@@ -21,7 +21,7 @@ export class FavoritesController {
 
   @Get('/:id')
   async getOneFavorite(@Param('id') id: string) {
-    return this.favoritesService.getOneFavoriteCollection(id);
+    return this.favoritesService.getAllFavoritesCollections();
   }
 
   @Post('track/:id')

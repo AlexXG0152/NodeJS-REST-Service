@@ -1,11 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-import { ITrack } from './track.interface';
 import { TrackDto } from './dto/track.dto';
 import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
 import { PrismaService } from 'src/prisma/prisma.service';
-
-export const tracks: ITrack[] = [];
 
 @Injectable({})
 export class TrackService {

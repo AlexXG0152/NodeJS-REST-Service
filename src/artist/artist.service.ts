@@ -6,14 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ArtistService {
-  constructor(
-    // @Inject(forwardRef(() => FavoritesService))
-    // private favoritesService: FavoritesService,
-    // @Inject(forwardRef(() => TrackService))
-    // private trackService: TrackService,
-    // @Inject(forwardRef(() => PrismaService))
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async getArtists() {
     try {

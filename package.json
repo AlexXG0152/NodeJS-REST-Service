@@ -14,7 +14,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "start:migrate:dev": "prisma migrate deploy && nest start --watch",
-    "scan": "docker scan nodejs-rest-service-app:latest",
+    "scan": "docker scan nodejs-rest-service-app:latest && docker scan nodejs-rest-service-db:latest",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --config ./test/jest-e2e.json",
     "test:auth": "cross-env TEST_MODE=auth jest --config ./test/jest-e2e.json",

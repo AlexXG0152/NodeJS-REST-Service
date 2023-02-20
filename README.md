@@ -13,9 +13,10 @@ Repository
 git clone https://github.com/AlexXG0152/NodeJS-REST-Service
 ```
 
-Dockerfile
+Dockerfiles from DockerHub
 ```
-docker pull alemdnfhs/nodejs-rest-service-app
+docker pull alemdnfhs/nodejs-rest-service-app:nodejs-rest-service-app
+docker pull alemdnfhs/nodejs-rest-service-db:nodejs-rest-service-db
 ```
 
 ## Installing NPM modules
@@ -44,7 +45,7 @@ npm start
 
 After starting the app on port (4000 as default).
 
-## Stoppeng application
+## Stop application
 
 DOCKER:
 ```
@@ -54,10 +55,10 @@ docker-compose down --volumes
 
 ## Scan
 
-Before scanning images you need to login into DockerHub by command docker login
+Before scanning images you need to login into DockerHub by command ```docker login```
 
 ```
-docker scan nodejs-rest-service-app:latest
+docker scan nodejs-rest-service-app:latest && docker scan nodejs-rest-service-db:latest
 ```
 
 ## Testing
