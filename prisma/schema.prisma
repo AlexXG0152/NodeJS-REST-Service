@@ -4,40 +4,40 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl"]
 }
 
 model Album {
-  id        String     @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
   year      Int
   artistId  String?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  artist    Artist?    @relation(fields: [artistId], references: [id])
-  favorite  Favorite[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  artist    Artist?  @relation(fields: [artistId], references: [id])
+  // favorite  Favorite[]
 }
 
 model Artist {
-  id        String     @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
-  grammy    Boolean    @default(false)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  grammy    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   albums    Album[]
-  favorite  Favorite[]
+  // favorite  Favorite[]
 }
 
 model Track {
-  id        String     @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
   name      String
   artistId  String?
   albumId   String?
   duration  Int
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  favorite  Favorite[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // favorite  Favorite[]
 }
 
 model User {
@@ -50,8 +50,9 @@ model User {
 }
 
 model Favorite {
-  id     String   @id @default(uuid())
-  artist Artist[]
-  album  Album[]
-  track  Track[]
+  id      String @id @default(uuid())
+  // favs   Json?
+  artists Json?
+  albums  Json?
+  tracks  Json?
 }

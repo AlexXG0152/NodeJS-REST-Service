@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  OnModuleInit,
+} from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { checkUUID } from 'src/helpers/checkers';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -17,122 +23,151 @@ export class FavoritesService {
 
   async getAllFavoritesCollections(): Promise<any> {
     try {
-      return await this.prisma.favorite.findMany({
-        include: { artist: true, album: true, track: true },
-      });
-    } catch (error) {}
+      const favs = await this.prisma.favorite.findMany();
+      return favs[0];
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getOneFavoriteCollection(id: string) {
     await checkUUID(id);
-    try {
-      return await this.prisma.favorite.findUnique({
-        where: { id },
-        include: { artist: true, album: true, track: true },
-      });
-    } catch (error) {}
+    //   try {
+    //     const favs = await this.prisma.favorite.findUnique({
+    //       where: { id },
+    //       include: { artists: true, albums: true, tracks: true },
+    //     });
+    //     console.log(favs);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
   }
 
   async createFavoritesCollection(id: string) {
     await checkUUID(id);
-    try {
-      return await this.prisma.favorite.create({
-        data: {},
-        include: { artist: true, album: true, track: true },
-      });
-    } catch (error) {
-      throw new HttpException(
-        'UNPROCESSABLE_ENTITY',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
+    //   try {
+    //     return await this.prisma.favorite.create({
+    //       data: {},
+    //       include: { artists: true, albums: true, tracks: true },
+    //     });
+    //   } catch (error) {
+    //     throw new HttpException(
+    //       'UNPROCESSABLE_ENTITY',
+    //       HttpStatus.UNPROCESSABLE_ENTITY,
+    //     );
+    //   }
   }
 
   async addToFavorites(id: string, section: string, fav: any) {
     await checkUUID(id);
+    const favRecord = await this.getAllFavoritesCollections();
     try {
       switch (section) {
         case 'artist':
-          return await this.prisma.favorite.update({
+          const artistFav = await this.prisma.artist.findUnique({
             where: { id },
-            data: {
-              artist: {
-                connect: { id: fav.id },
-              },
-            },
-            include: { artist: true },
           });
+          delete artistFav.createdAt;
+          delete artistFav.updatedAt;
+
+          const updateArtist = await this.prisma.favorite.update({
+            where: { id: favRecord.id },
+            data: {
+              artists: [...favRecord.artists.splice(0), artistFav],
+            },
+          });
+          return updateArtist[0];
 
         case 'album':
-          return await this.prisma.favorite.update({
+          const albumFav = await this.prisma.album.findUnique({
             where: { id },
-            data: {
-              album: {
-                connect: { id: fav.id },
-              },
-            },
-            include: { album: true },
           });
+          delete albumFav.createdAt;
+          delete albumFav.updatedAt;
+
+          const updateAlbum = await this.prisma.favorite.update({
+            where: { id: favRecord.id },
+            data: {
+              albums: [...favRecord.albums.splice(0), albumFav],
+            },
+          });
+          return updateAlbum[0];
+        //   return await this.prisma.favorite.update({
+        //     where: { id },
+        //     data: { albums: fav.id },
+        //     // include: { albums: true },
+        // });
 
         case 'track':
-          return await this.prisma.favorite.update({
+          const trackFav = await this.prisma.track.findUnique({
             where: { id },
-            data: {
-              track: {
-                connect: { id: fav.id },
-              },
-            },
-            include: { track: true },
           });
+          delete trackFav.createdAt;
+          delete trackFav.updatedAt;
+
+          const updateTrack = await this.prisma.favorite.update({
+            where: { id: favRecord.id },
+            data: {
+              tracks: [...favRecord.tracks.splice(0), trackFav],
+            },
+          });
+          return updateTrack[0];
+        //   return await this.prisma.favorite.update({
+        //     where: { id },
+        //     data: { tracks: fav.id },
+        //     // include: { tracks: true },
+        //   });
 
         default:
           const unknownSection = section;
           throw new Error(`Unknown section ${unknownSection}`);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async deleteFromFavorites(id: string, section: string, fav: any) {
     await checkUUID(id);
-    try {
-      switch (section) {
-        case 'artist':
-          return await this.prisma.favorite.update({
-            where: { id },
-            data: {
-              artist: {
-                disconnect: { id: fav.id },
-              },
-            },
-            include: { artist: true },
-          });
+    //   try {
+    //     switch (section) {
+    //       case 'artist':
+    //         return await this.prisma.favorite.update({
+    //           where: { id },
+    //           data: {
+    //             artists: {
+    //               disconnect: { id: fav.id },
+    //             },
+    //           },
+    //           include: { artists: true },
+    //         });
 
-        case 'album':
-          return await this.prisma.favorite.update({
-            where: { id },
-            data: {
-              album: {
-                disconnect: { id: fav.id },
-              },
-            },
-            include: { album: true },
-          });
+    //       case 'album':
+    //         return await this.prisma.favorite.update({
+    //           where: { id },
+    //           data: {
+    //             albums: {
+    //               disconnect: { id: fav.id },
+    //             },
+    //           },
+    //           include: { albums: true },
+    //         });
 
-        case 'track':
-          return await this.prisma.favorite.update({
-            where: { id },
-            data: {
-              track: {
-                disconnect: { id: fav.id },
-              },
-            },
-            include: { track: true },
-          });
+    //       case 'track':
+    //         return await this.prisma.favorite.update({
+    //           where: { id },
+    //           data: {
+    //             tracks: {
+    //               disconnect: { id: fav.id },
+    //             },
+    //           },
+    //           include: { tracks: true },
+    //         });
 
-        default:
-          const unknownSection = section;
-          throw new Error(`Unknown section ${unknownSection}`);
-      }
-    } catch (error) {}
+    //       default:
+    //         const unknownSection = section;
+    //         throw new Error(`Unknown section ${unknownSection}`);
+    //     }
+    //   } catch (error) {}
   }
 }
