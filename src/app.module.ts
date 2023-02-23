@@ -10,6 +10,8 @@ import { ArtistModule } from './artist/artist.module';
 import { AlbumModule } from './album/album.module';
 import { TrackModule } from './track/track.module';
 import { FavoriteModule } from './favorites/favorites.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AtGuard } from './auth/common/guards';
 
 @Module({
   imports: [
@@ -32,6 +34,12 @@ import { FavoriteModule } from './favorites/favorites.module';
     FavoriteModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
+  ],
 })
 export class AppModule {}

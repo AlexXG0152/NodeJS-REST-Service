@@ -48,7 +48,8 @@ export class AuthService {
 
       await this.updateRefreshToken(createdUser.id, refreshToken);
 
-      return { accessToken, refreshToken };
+      // return { accessToken, refreshToken };
+      return { message: 'dto is valid' };
     } catch (error) {
       console.log(error);
     }
@@ -81,6 +82,7 @@ export class AuthService {
     await this.updateRefreshToken(user.id, refreshToken);
 
     return { accessToken, refreshToken };
+    // return { message: 'dto is valid' };
   }
 
   async signOut(id: string) {
@@ -118,7 +120,7 @@ export class AuthService {
 
     await this.updateRefreshToken(user.id, refreshToken);
 
-    return { accessToken, refreshToken };
+    return { refreshToken };
   }
 
   async hashPassword(password: string): Promise<string> {
