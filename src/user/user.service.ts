@@ -29,7 +29,6 @@ export class UserService {
 
   async getUser(id: string) {
     await checkUUID(id);
-    await cheskIsExists(id, this.prisma.user);
     try {
       const user = await cheskIsExists(id, this.prisma.user);
       delete user.password;
@@ -42,6 +41,8 @@ export class UserService {
   async createUser(data: CreateUserDto) {
     try {
       const hashedPassword = await this.authService.hashPassword(data.password);
+      data['password'] = hashedPassword;
+
       const user = await this.prisma.user.create({
         data: {
           login: data.login,
@@ -50,9 +51,13 @@ export class UserService {
           updatedAt: Math.floor(Date.now() / 1000),
         },
       });
+
       delete user.password;
+
       return user;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async updateUser(id: string, data: UpdatePasswordDto) {
@@ -61,15 +66,15 @@ export class UserService {
     const oldData = await cheskIsExists(id, this.prisma.user);
 
     const isPasswordMatch = await bcrypt.compare(
+      data.newPassword,
       oldData.password,
-      await bcrypt.hash(data.newPassword, Number(process.env.CRYPT_SALT)),
     );
 
     if (isPasswordMatch) {
       throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
     }
 
-    const hashedPassword = await this.authService.hashPassword(
+    const hashedNewPassword = await this.authService.hashPassword(
       data.newPassword,
     );
 
@@ -77,7 +82,7 @@ export class UserService {
       const user = await this.prisma.user.update({
         where: { id },
         data: {
-          password: hashedPassword,
+          password: hashedNewPassword,
           version: { increment: 1 },
           updatedAt: Math.floor(Date.now() / 1010),
         },
