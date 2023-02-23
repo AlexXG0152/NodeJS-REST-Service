@@ -18,6 +18,7 @@ export class AuthService {
     private prisma: PrismaService,
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
+    @Inject(forwardRef(() => JwtService))
     private jwt: JwtService,
   ) {}
 
