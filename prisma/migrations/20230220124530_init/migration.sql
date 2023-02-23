@@ -40,6 +40,7 @@ CREATE TABLE "User" (
     "login" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "version" INTEGER NOT NULL DEFAULT 1,
+    "hashedRt" TEXT,
     "createdAt" INTEGER NOT NULL,
     "updatedAt" INTEGER NOT NULL,
 

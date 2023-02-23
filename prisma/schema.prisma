@@ -45,6 +45,7 @@ model User {
   login     String @unique
   password  String
   version   Int    @default(1)
+  hashedRt  String?
   createdAt Int
   updatedAt Int
 }

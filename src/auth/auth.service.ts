@@ -11,7 +11,6 @@ import { AuthDTO } from './dto/auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
-import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -24,27 +23,44 @@ export class AuthService {
 
   async signUp(data: AuthDTO) {
     const { login, password } = data;
+
     const user = await this.prisma.user.findUnique({ where: { login } });
 
     if (user) {
-      throw new BadRequestException('User alreade exists!');
+      throw new BadRequestException('User already exists!');
     }
 
     const hashedPassword = await this.hashPassword(password);
     data[password] = hashedPassword;
+
     try {
-      await this.userService.createUser(data as CreateUserDto);
-      return { message: 'DTO is valid!' };
-    } catch (error) {}
+      const createdUser = await this.userService.createUser(
+        data as CreateUserDto,
+      );
+
+      const [accessToken, refreshToken] = await this.generateTokens(
+        createdUser,
+      );
+
+      if (!accessToken) {
+        throw new ForbiddenException();
+      }
+
+      await this.updateRefreshToken(createdUser.id, refreshToken);
+
+      return { accessToken, refreshToken };
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  async login(data: AuthDTO, req: Request, res: Response) {
+  async login(data: AuthDTO) {
     const { login, password } = data;
 
     const user = await this.prisma.user.findUnique({ where: { login } });
 
     if (!user) {
-      throw new BadRequestException('Wrong credentials!');
+      throw new ForbiddenException('Access Denied');
     }
 
     const isPasswordMatch = await this.comparePasswords({
@@ -53,31 +69,60 @@ export class AuthService {
     });
 
     if (!isPasswordMatch) {
-      throw new BadRequestException('Wrong credentials!');
+      throw new ForbiddenException('Access Denied');
     }
 
-    const token = await this.signToken({ id: user.id, login: user.login });
+    const [accessToken, refreshToken] = await this.generateTokens(user);
 
-    if (!token) {
+    if (!accessToken) {
       throw new ForbiddenException();
     }
 
-    res.cookie('token', token);
+    await this.updateRefreshToken(user.id, refreshToken);
 
-    return res.send({ message: 'Logged in successfully' });
+    return { accessToken, refreshToken };
   }
 
-  async signOut() {
-    return '';
+  async signOut(id: string) {
+    await this.prisma.user.updateMany({
+      where: {
+        id,
+        hashedRt: {
+          not: null,
+        },
+      },
+      data: {
+        hashedRt: null,
+      },
+    });
   }
 
-  async refresh() {
-    return '';
+  async refresh(id: string, rfToken: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    const isRefreshTokenMatch = await bcrypt.compare(rfToken, user.hashedRt);
+
+    if (!isRefreshTokenMatch) {
+      throw new ForbiddenException('Access Denied');
+    }
+    console.log(isRefreshTokenMatch);
+
+    const [accessToken, refreshToken] = await this.generateTokens(user);
+
+    if (!accessToken) {
+      throw new ForbiddenException();
+    }
+
+    await this.updateRefreshToken(user.id, refreshToken);
+
+    return { accessToken, refreshToken };
   }
 
   async hashPassword(password: string): Promise<string> {
-    const saltOrRounds = 10;
-    return await bcrypt.hash(password, saltOrRounds);
+    return await bcrypt.hash(password, Number(process.env.CRYPT_SALT));
   }
 
   async comparePasswords(args: {
@@ -87,8 +132,39 @@ export class AuthService {
     return await bcrypt.compare(args.password, args.hash);
   }
 
-  async signToken(args: { id: string; login: string }) {
+  async generateAccessToken(args: { id: string; login: string }) {
     const payload = args;
-    return this.jwt.signAsync(payload, { secret: process.env.JWT_SECRET_KEY });
+    return await this.jwt.signAsync(payload, {
+      secret: process.env.JWT_SECRET_KEY,
+      expiresIn: process.env.TOKEN_EXPIRE_TIME,
+    });
+  }
+
+  async generateRefreshToken(id: string) {
+    return await this.jwt.signAsync(
+      { id, refresh: true },
+      {
+        secret: process.env.JWT_SECRET_REFRESH_KEY,
+        expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
+      },
+    );
+  }
+
+  async updateRefreshToken(id: string, refreshToken: string) {
+    const hash = await this.hashPassword(refreshToken);
+    await this.prisma.user.update({
+      where: { id },
+      data: { hashedRt: hash },
+    });
+  }
+
+  async generateTokens(user) {
+    return Promise.all([
+      await this.generateAccessToken({
+        id: user.id,
+        login: user.login,
+      }),
+      await this.generateRefreshToken(user.id),
+    ]);
   }
 }
