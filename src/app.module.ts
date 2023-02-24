@@ -1,3 +1,4 @@
+import { LoggerModule } from './logger/logger.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -15,6 +16,7 @@ import { AtGuard } from './auth/common/guards';
 
 @Module({
   imports: [
+    LoggerModule,
     AuthModule,
     PrismaModule,
     UserModule,

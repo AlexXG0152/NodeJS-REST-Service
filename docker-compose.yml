@@ -46,7 +46,8 @@ services:
       - db
     restart: always
     command: npm run start:migrate:dev
-    # volumes:
+    volumes:
+      - app-logs:${APPLOGSFOLDER}
     # - ./:/app/
 
 networks:
@@ -56,3 +57,4 @@ networks:
 volumes:
   postgres-data:
   postgres-logs:
+  app-logs:

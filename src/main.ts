@@ -4,12 +4,16 @@ import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
+import { LoggerService } from './logger/logger.service';
 
 async function bootstrap() {
   const host = `http://127.0.0.1:${process.env.PORT}`;
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
   app.useGlobalPipes(new ValidationPipe());
+  app.useLogger(new LoggerService());
   app.use(cookieParser());
 
   const prismaService = app.get(PrismaService);

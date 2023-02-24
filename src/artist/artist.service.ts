@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { ArtistDto } from './dto/artist.dto';
-import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
+import { checkUUID, cheskIsExists } from 'src/common/helpers/checkers';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()

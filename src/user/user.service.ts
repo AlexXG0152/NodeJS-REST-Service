@@ -9,7 +9,7 @@ import * as bcrypt from 'bcrypt';
 
 import { UpdatePasswordDto } from './dto/updateUser.dto';
 import { CreateUserDto } from './dto/createUser.dto';
-import { checkUUID, cheskIsExists } from 'src/helpers/checkers';
+import { checkUUID, cheskIsExists } from 'src/common/helpers/checkers';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 
