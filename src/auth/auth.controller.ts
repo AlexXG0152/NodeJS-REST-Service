@@ -39,7 +39,6 @@ export class AuthController {
       await this.loggerService.loggerError(req, res, error);
       return res.status(error.status).send(error);
     }
-    // return this.authService.signUp(data);
   }
 
   @Public()
@@ -57,7 +56,6 @@ export class AuthController {
       await this.loggerService.loggerError(req, res, error);
       return res.status(error.status).send(error);
     }
-    // return this.authService.login(data);
   }
 
   @Post('signout')
@@ -71,10 +69,6 @@ export class AuthController {
       await this.loggerService.loggerError(req, res, error);
       return res.status(error.status).send(error);
     }
-    // const user = req.user;
-    // return this.authService.signOut(user['id']);
-    // async signout(@GetCurrentUser('id') id: string) {
-    //   return this.authService.signOut(id);
   }
 
   @Public()
@@ -92,7 +86,5 @@ export class AuthController {
       await this.loggerService.loggerError(req, res, error);
       return res.status(error.status).send(error);
     }
-    // const user = req.user;
-    // return this.authService.refresh(user['id'], user['refreshToken']);
   }
 }

@@ -47,7 +47,6 @@ export class AuthService {
       await this.updateRefreshToken(createdUser.id, refreshToken);
 
       return { accessToken, refreshToken };
-      // return { message: 'dto is valid' };
     } catch (error) {
       console.log(error);
     }
@@ -56,9 +55,7 @@ export class AuthService {
   async login(data: AuthDTO) {
     const { login, password } = data;
 
-    // Вообще правильнее findUnique, т.к. в базе поле уникальное. Но без него не проходят тесты.
-    // А тесты править нельзя...
-    const user = await this.prisma.user.findFirst({ where: { login: login } }); //findUnique
+    const user = await this.prisma.user.findFirst({ where: { login: login } });
 
     if (!user) {
       throw new ForbiddenException('Access Denied1');
@@ -82,7 +79,6 @@ export class AuthService {
     await this.updateRefreshToken(user.id, refreshToken);
 
     return { accessToken, refreshToken };
-    // return { message: 'dto is valid' };
   }
 
   async signOut(id: string) {
