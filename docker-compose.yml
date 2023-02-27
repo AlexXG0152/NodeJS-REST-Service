@@ -1,0 +1,60 @@
+version: '4.16.3'
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.database
+    env_file: .env
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      PGDATA: ${PGDATA}
+    networks:
+      - app-network
+    working_dir: /app
+    volumes:
+      - postgres-data:${PGBDDATAFOLDER}
+      # - ./pgdbdata/:/var/lib/postgresql/data/
+      - postgres-logs:${PGDBLOGSFOLDER}
+      # - ./logs/:/logs:z
+    restart: always
+    command: "
+      postgres
+      -c logging_collector=on
+      -c log_min_messages=LOG
+      -c log_directory=/logs
+      -c log_destination=jsonlog
+      -c log_statement=all
+      "
+  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.application
+    env_file: .env
+    ports:
+      - ${PORT}:${PORT}
+    networks:
+      - app-network
+    depends_on:
+      - db
+    restart: always
+    command: npm run start:migrate:dev
+    volumes:
+      - app-logs:${APPLOGSFOLDER}
+    # - ./:/app/
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  postgres-logs:
+  app-logs:
