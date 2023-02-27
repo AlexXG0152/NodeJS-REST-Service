@@ -1,53 +1,41 @@
 import { ConsoleLogger, Injectable, Logger, Scope } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { PathLike } from 'fs';
 import { appendFile } from 'fs/promises';
+import { stat } from 'node:fs/promises';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService extends ConsoleLogger {
   private readonly logger = new Logger('CUSTOM_LOGGER');
 
-  //   log(level: 'log' | 'info' | 'warn', message: string) {
-  //     if (level === 'log') {
-  //       return this.logger.log(message);
-  //     }
-  //     if (level === 'info') {
-  //       return this.logger.debug(message);
-  //     }
-  //     if (level === 'warn') {
-  //       return this.logger.warn(message);
-  //     }
-  //   }
+  private logFileName = 'logs';
+  private logChapter = 0;
+  private errorFileName = 'errors';
+  private errorChapter = 0;
 
-  private stringifyParameters(parameters?: unknown[]) {
-    try {
-      return JSON.stringify(parameters);
-    } catch {
-      return '';
-    }
-  }
-
-  log(message: any, stack?: string, context?: string) {
-    const file = 'logs/logs.log';
+  async log(message: any, stack?: string) {
     const date = new Date().toISOString();
-    appendFile(file, `${date} --- ${stack} --- ${message}\n`, 'utf8').catch(
-      console.error,
+    const log = `${date} --- ${stack} --- ${message}\n`;
+    this.logChapter = await this.checkFileSize(
+      `logs/${this.logFileName}_${this.logChapter}.log`,
+      this.logChapter,
     );
+    const file = `logs/${this.logFileName}_${this.logChapter}.log`;
+    await appendFile(file, log, 'utf8').catch(console.error);
     super.log(stack, message);
   }
 
-  error(message: any, stack?: string, context?: string): void;
-  error(message: any, ...optionalParams: any[]): void;
-  error(
-    message: unknown,
-    stack?: unknown,
-    context?: unknown,
-    ...rest: unknown[]
-  ): void {
-    const file = 'logs/errors.log';
+  async error(message: any, stack?: string, context?: string);
+  async error(message: any, ...optionalParams: any[]);
+  async error(message: unknown, stack?: unknown) {
     const date = new Date().toISOString();
-    appendFile(file, `${date} --- ${stack} --- ${message}\n`, 'utf8').catch(
-      console.error,
+    const log = `${date} --- ${stack} --- ${message}\n`;
+    this.errorChapter = await this.checkFileSize(
+      `logs/${this.errorFileName}_${this.errorChapter}.log`,
+      this.errorChapter,
     );
+    const file = `logs/${this.errorFileName}_${this.errorChapter}.log`;
+    appendFile(file, log, 'utf8').catch(console.error);
     super.error(stack, message);
   }
 
@@ -78,5 +66,24 @@ export class LoggerService extends ConsoleLogger {
       error.status
     }, STATUS_MESAGE: ${res.statusMessage}, ERROR: ${error}`;
     this.logger.error(message);
+  }
+
+  private stringifyParameters(parameters?: unknown[]) {
+    try {
+      return JSON.stringify(parameters);
+    } catch {
+      return '';
+    }
+  }
+
+  async getFileSize(file: PathLike) {
+    return (await stat(file)).size;
+  }
+
+  async checkFileSize(file: PathLike, chapter: number) {
+    const size = await this.getFileSize(file);
+    return size > Number(process.env.MAX_LOG_FILE_SIZE)
+      ? (chapter += 1)
+      : chapter;
   }
 }

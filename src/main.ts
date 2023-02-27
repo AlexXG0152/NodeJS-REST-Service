@@ -10,6 +10,12 @@ async function bootstrap() {
   const host = `http://127.0.0.1:${process.env.PORT}`;
 
   const app = await NestFactory.create(AppModule, {
+    logger:
+      process.env.LOG_LEVEL === '2'
+        ? ['log', 'debug', 'error', 'verbose', 'warn']
+        : process.env.LOG_LEVEL === '1'
+        ? ['debug', 'error', 'warn']
+        : ['debug'],
     bufferLogs: true,
   });
   app.useGlobalPipes(new ValidationPipe());

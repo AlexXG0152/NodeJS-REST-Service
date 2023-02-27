@@ -13,10 +13,10 @@ COPY . .
 EXPOSE ${PORT}
 
 RUN mkdir logs \
- && touch logs/logs.log \
- && chmod 777 logs/logs.log \
- && touch logs/errors.log \
- && chmod 777 logs/errors.log
+ && touch logs/logs_0.log \
+ && chmod 777 logs/logs*.log \
+ && touch logs/errors_0.log \
+ && chmod 777 logs/errors*.log
 # RUN npm run build
 
 # CMD ["npm", "run", "start:migrate:dev"]

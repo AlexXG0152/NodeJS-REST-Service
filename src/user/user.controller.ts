@@ -29,9 +29,13 @@ export class UserController {
 
   @Get('/')
   async getAllUsers(@Req() req: Request, @Res() res: Response) {
-    // this.loggerService.warn('About to return cats!');
-    await this.loggerService.loggerGetDelete(req, res);
-    return res.send(await this.userService.getUsers());
+    try {
+      await this.loggerService.loggerGetDelete(req, res);
+      return res.send(await this.userService.getUsers());
+    } catch (error) {
+      await this.loggerService.loggerError(req, res, error);
+      return res.status(error.status).send(error);
+    }
   }
 
   @Get(':id')
@@ -45,7 +49,7 @@ export class UserController {
       return res.send(await this.userService.getUser(id));
     } catch (error) {
       await this.loggerService.loggerError(req, res, error);
-      return res.send(error);
+      return res.status(error.status).send(error);
     }
   }
 
@@ -56,8 +60,13 @@ export class UserController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    await this.loggerService.loggerPostPut(req, res);
-    return res.send(await this.userService.createUser(user));
+    try {
+      await this.loggerService.loggerPostPut(req, res);
+      return res.send(await this.userService.createUser(user));
+    } catch (error) {
+      await this.loggerService.loggerError(req, res, error);
+      return res.status(error.status).send(error);
+    }
   }
 
   @Put(':id')
@@ -67,8 +76,13 @@ export class UserController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    await this.loggerService.loggerPostPut(req, res);
-    return res.send(await this.userService.updateUser(id, data));
+    try {
+      await this.loggerService.loggerPostPut(req, res);
+      return res.send(await this.userService.updateUser(id, data));
+    } catch (error) {
+      await this.loggerService.loggerError(req, res, error);
+      return res.status(error.status).send(error);
+    }
   }
 
   @Delete(':id')
@@ -78,7 +92,12 @@ export class UserController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    await this.loggerService.loggerGetDelete(req, res);
-    return res.send(await this.userService.deleteUser(id));
+    try {
+      await this.loggerService.loggerGetDelete(req, res);
+      return res.send(await this.userService.deleteUser(id));
+    } catch (error) {
+      await this.loggerService.loggerError(req, res, error);
+      return res.status(error.status).send(error);
+    }
   }
 }
